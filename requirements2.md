@@ -122,3 +122,11 @@
  > 暂时未想清楚如何仅从协议栈角度判断调用是否成功
  
  > 从建立连接到断开连接未发送任何数据？
+ 
+ 
+ ## 实现
+ 
+ 通过程序读取 /proc/net/tcp文件内容，实时刷新，获取每个tcp连接的状态变迁，再结合服务器端口判断，得到每次调用的开始和结束时间。
+ 
+ /proc/net/tcp 的解释参考  https://github.com/cyberhorse208/bigbrother/blob/master/proc_net_tcp.md
+ 
