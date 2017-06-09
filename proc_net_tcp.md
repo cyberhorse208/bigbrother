@@ -25,7 +25,7 @@
 
 # another sample
 
-sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode
+  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode
    0: 0101007F:0035 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 21793 1 0000000000000000 100 0 0 10 0
    1: 2703A8C0:8876 5DA9D374:0050 04 00000001:00000000 01:0000011B 00000003     0        0 0 3 0000000000000000 832 4 0 1 7
    2: 2703A8C0:A160 214261B4:01BB 06 00000000:00000000 03:000013D6 00000000     0        0 0 3 0000000000000000
@@ -59,15 +59,16 @@ sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid 
 格式参考  www.linuxdevcenter.com/pub/a/linux/2000/11/16/LinuxAdmin.html
 
 
-我们主要关注的列是，local_address本地地址:端口、rem_address远程地址:端口、st连接状态、inode（打开的socket的fd对应的inode号）。
+我们主要关注的列是，local_address本地地址:端口、rem_address远程地址:端口、st连接状态、inode。
 
-inode号可以唯一的标示一个socket（对应一个local_address+rem_address对），因此，我们关注同一个inode的状态变迁即可得知对应的socket的状态变迁。
 
-注1：文件中都是用的16进制，所以HTTP的80端口记录为0050。
 
-注2：ip地址的16进制需要先做字节序转换，才能对应到点分式的ip地址形式。
 
-注3：状态码对应如下
+* 注1：文件中都是用的16进制，所以HTTP的80端口记录为0050。
+
+* 注2：ip地址的16进制需要先做字节序转换，才能对应到点分式的ip地址形式。
+
+* 注3：状态码对应如下
 ```
 00  “ERROR_STATUS”,
 01  “TCP_ESTABLISHED”,
@@ -82,3 +83,9 @@ inode号可以唯一的标示一个socket（对应一个local_address+rem_addres
 0A  “TCP_LISTEN”,
 0B  “TCP_CLOSING”,
 ```
+
+* 注4：
+
+> 非0的inode号可以唯一的标示一个非TIME-WAIT状态的socket（对应一个local_address+rem_address对），因此，我们关注同一个inode的状态变迁即可得知对应的socket的状态变迁。
+
+> 为0的inode表示的tcp连接都处于TIME-WAIT状态，即将被系统回收。
