@@ -237,9 +237,9 @@ lrwx------ 1 will will 64 6月  21 16:45 89 -> socket:[64757]
 
 > 根据app的服务端口，判断出站socket和入站socket，并根据进入TCP_ESTABLISHED状态的时间S（调用开始时间）先后顺序，形成入站队列。
 
-> 根据分析中的假设，app同一时间，最多打开一个出站连接，这个连接与入站队列的对头相匹配。记录此匹配信息(包含两个连接的local_address 和 rem_address)。
+> 根据分析中的假设，app同一时间，最多打开一个出站连接，这个连接是入站队列的队头派生的。记录此匹配信息(包含两个连接的local_address 和 rem_address)。如果没有出站连接，那么队头连接匹配一个空连接。
 
-> 入站队列对头连接状态变为TCP_ClOSE_WAIT时，记录时间E（调用结束时间）。
+> 入站队列队头连接状态变为TCP_ClOSE_WAIT时，记录时间E（调用结束时间）。将队头删除。
 
 > 向中央服务器上报本机发生调用信息：（local_address，入站local_address+rem_address, [出站local_address+rem_address]， S，E）
  
