@@ -36,7 +36,9 @@
 
 监控预期结果：
 >	系统A调用次数+1
+
 > 	调用traceid为TR1的调用，由A完成
+
 >	系统A本次调用耗时T2-T1
 
 ### 场景2
@@ -152,7 +154,7 @@
 
 > A返回ACK。B的/proc/net/tcp 中条目B:8000 A:23919状态变为TCP_ESTABLISHED。
 
-> 应用程序app调用accept函数，从等待队列中取出一个待接受请求，进行处理。
+> 应用程序app调用accept函数，从backlog等待队列中取出队头待接受请求，进行处理。
 
 > app处理过程中，发现需要调用上游服务器C的服务，就调用connect函数，发出调用请求（通过随机端口23422）。B的/proc/net/tcp 中出现一个条目 B:23422 C:9000，状态为TCP_SYN_SENT。
 
@@ -194,9 +196,9 @@
  
 ## 实现
  
- 基于 [/proc/net/tcp](https://github.com/cyberhorse208/bigbrother/blob/master/proc_net_tcp.md)文件内容来实现。**默认假设，需要确认：/proc/net/tcp中连接的出现时间、状态变化与协议栈中存在的连接有着严格的对应关系**
+ 基于 [/proc/net/tcp](https://github.com/cyberhorse208/bigbrother/blob/master/proc_net_tcp.md)文件内容来实现。**默认假设，需要确认：/proc/net/tcp中连接的出现时间、状态变化与协议栈中存在的连接有着严格的对应关系。**
  
-* 基础：识别连接属于目标应用。
+* 识别连接属于目标应用。
 
 可选方法是：
 
@@ -212,9 +214,6 @@ lrwx------ 1 will will 64 6月  21 16:45 89 -> socket:[64757]
 ```
 > socket:[xxx]的xxx就是在/proc/net/tcp中inode列中出现的值，对应的连接都属于这个app。
 
-* 服务注册以及调用关系保存
-
-使用中央服务器，存储每个提供服务的app的信息（name，ip，port），并接收各个服务上报的调用关系。
 
 * 服务器工作过程：
 
@@ -235,7 +234,9 @@ lrwx------ 1 will will 64 6月  21 16:45 89 -> socket:[64757]
  
 * 中央服务器工作过程
 
-中央服务器根据各个服务器上报的调用信息，进行匹配，形成调用链。
+中央服务器存储每个提供服务的app的信息（name，ip，port），并接收各个服务上报的调用关系。
+
+根据各个服务器上报的调用信息，进行匹配，形成调用链，同时可以对调用链的每个层级进行编号。
  
  > 调用链源头， 只有出站连接，traceid可以在这里生成，生成规则自定义。
  
